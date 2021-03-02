@@ -5,4 +5,6 @@ cd /var/app/current/;
 export HOME=/root;
 export GOCACHE=/root/builds;
 
-go run main.go;
+go run main.go &>/dev/null &;
+
+disown %1;
