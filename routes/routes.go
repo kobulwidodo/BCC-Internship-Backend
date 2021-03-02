@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bengkel/middleware"
 	"bengkel/service"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,12 @@ func AddRoutes() *gin.Engine {
 			order.GET("/", service.GetAllOrder)
 			order.POST("/new", service.PostNewOrder)
 			order.GET("/:order_id", service.GetOrder)
-			order.PUT("/:order_id", service.PutStatusOrder)
+			order.PUT("/:order_id", middleware.IsAuth(), service.PutStatusOrder)
+		}
+
+		auth := api.Group("/auth")
+		{
+			auth.POST("/register", service.PostRegitserUser)
 		}
 	}
 

@@ -18,4 +18,5 @@ func InitDB() {
 	}
 	
 	DB.AutoMigrate(&entity.Order{})
+	DB.AutoMigrate(&entity.User{})
 }
