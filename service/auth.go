@@ -30,9 +30,9 @@ func PostRegitserUser(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(201, gin.H{
 		"message" : "Berhasil membuat Akun",
-		"status": 200,
+		"status": 201,
 	})
 }
 
@@ -58,7 +58,7 @@ func PostLoginUser(c *gin.Context)  {
 	var jwtToken = generateToken(&user)
 
 	c.JSON(200, gin.H{
-		"data": user,
+		"status": 200,
 		"message": "Berhasil Login!",
 		"token": jwtToken,
 	})
