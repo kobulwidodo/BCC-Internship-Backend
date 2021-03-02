@@ -25,6 +25,7 @@ func AddRoutes() *gin.Engine {
 
 		auth := api.Group("/auth")
 		{
+			auth.POST("/login", service.PostLoginUser)
 			auth.POST("/register", service.PostRegitserUser)
 		}
 	}

@@ -3,15 +3,20 @@ package service
 import (
 	"bengkel/entity"
 	"bengkel/models"
+	"fmt"
 	"net/http"
+	"os"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
+var JWT_SECRET = os.Getenv("JWT_SECRET")
 
 func PostRegitserUser(c *gin.Context) {
 	var user entity.RegisterUser
-	if err := c.Bind(&user); err != nil{
+	if err := c.BindJSON(&user); err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": http.StatusBadRequest,
 		})
@@ -29,4 +34,49 @@ func PostRegitserUser(c *gin.Context) {
 		"message" : "Berhasil membuat Akun",
 		"status": 200,
 	})
+}
+
+func PostLoginUser(c *gin.Context)  {
+	var loginUser entity.LoginUser
+	if err := c.BindJSON(&loginUser); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": http.StatusBadRequest,
+		})
+		c.Abort()
+		return
+	}
+
+	var user entity.User
+	err := models.LoginUser(&loginUser, &user)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"status": 404,
+		})
+		c.Abort()
+		return
+	}
+	var jwtToken = generateToken(&user)
+
+	c.JSON(200, gin.H{
+		"data": user,
+		"message": "Berhasil Login!",
+		"token": jwtToken,
+	})
+
+}
+
+func generateToken(user *entity.User) string {
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		"user_role": user.Role,
+		"exp": time.Now().AddDate(0, 0, 7).Unix(),
+		"iat": time.Now().Unix(),
+	})
+
+	tokenString, err := jwtToken.SignedString([]byte(JWT_SECRET))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return tokenString
 }

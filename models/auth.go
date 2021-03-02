@@ -16,8 +16,16 @@ func RegitserUser(user *entity.RegisterUser) (err error) {
 		Email: user.Email,
 		Username: user.Username,
 		Password: user.Password,
+		Role: "Buyer",
 	}
 	if err := config.DB.Save(&newUser).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
+	if err := config.DB.First(&user, "email = ? AND password = ?", loginUser.Email, loginUser.Password).Error; err != nil {
 		return err
 	}
 	return nil
