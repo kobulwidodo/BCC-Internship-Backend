@@ -79,7 +79,7 @@ func PutStatusOrder(c *gin.Context)  {
 		return
 	}
 	var isAdmin string = c.MustGet("jwt_user_role").(string)
-	if isAdmin != "Admin" {
+	if isAdmin == "Buyer" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status": http.StatusUnauthorized,
 		})
