@@ -3,14 +3,17 @@ package main
 import (
 	"bengkel/config"
 	"bengkel/routes"
+	"log"
+	"os"
 
 	"github.com/subosito/gotenv"
 )
 
 
 func main() {
-	config.InitDB()
 	gotenv.Load()
+	config.InitDB()
+	log.Println(os.Getenv("DB_HOST"))
 	r := routes.AddRoutes()
 
 	r.Run();
