@@ -8,7 +8,7 @@ import (
 
 
 func RegitserUser(user *entity.RegisterUser) (err error) {
-	if err := checkEmailExist(user.Email); err != nil {
+	if err := checkDataExist(user.Email, user.Username); err != nil {
 		return err;
 	}
 	newUser := entity.User{
@@ -31,10 +31,10 @@ func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
 	return nil
 }
 
-func checkEmailExist(email string) (err error) {
+func checkDataExist(email string, username string) (err error) {
 	var user entity.User
-	if err := config.DB.First(&user, "email = ?", email).Error; err == nil {
-		return errors.New("Email Sudah diAmbil")
+	if err := config.DB.First(&user, "email = ? OR username = ?", email, username).Error; err == nil {
+		return errors.New("Data sudah tersedia")
 	}
 	return nil
 }
