@@ -33,7 +33,7 @@ func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
 
 func checkDataExist(email string, username string) (err error) {
 	var user entity.User
-	if err := config.DB.First(&user, "email = ? OR username = ?", email, username).Error; err == nil {
+	if err := config.DB.First(&user, "email = ? OR username = ?", email, username).Error;err == nil {
 		return errors.New("Data sudah tersedia")
 	}
 	return nil
