@@ -16,5 +16,5 @@ func main() {
 	log.Println(os.Getenv("DB_HOST"))
 	r := routes.AddRoutes()
 
-	r.Run();
+	r.Run(":"+os.Getenv("PORT"));
 }
