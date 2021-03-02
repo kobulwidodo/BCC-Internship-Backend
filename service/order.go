@@ -78,6 +78,14 @@ func PutStatusOrder(c *gin.Context)  {
 		c.Abort()
 		return
 	}
+	var isAdmin string = c.MustGet("jwt_user_role").(string)
+	if isAdmin != "Admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+		})
+		c.Abort()
+		return
+	}
 	var newStatus entity.UpdateStatus
 	if err := c.BindJSON(&newStatus); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
