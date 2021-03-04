@@ -4,6 +4,8 @@ import (
 	"bengkel/config"
 	"bengkel/entity"
 	"errors"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -11,11 +13,15 @@ func RegitserUser(user *entity.RegisterUser) (err error) {
 	if err := checkDataExist(user.Email, user.Username); err != nil {
 		return err;
 	}
+	PasswordHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost);
+	if err != nil {
+		return err
+	}
 	newUser := entity.User{
 		Name: user.Name,
 		Email: user.Email,
 		Username: user.Username,
-		Password: user.Password,
+		Password: string(PasswordHash),
 		Role: "Buyer",
 	}
 	if err := config.DB.Save(&newUser).Error; err != nil {
@@ -25,7 +31,10 @@ func RegitserUser(user *entity.RegisterUser) (err error) {
 }
 
 func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
-	if err := config.DB.First(&user, "email = ? AND password = ?", loginUser.Email, loginUser.Password).Error; err != nil {
+	if err := config.DB.First(&user, "email = ?", loginUser.Email).Error; err != nil {
+		return err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginUser.Password)); err != nil {
 		return err
 	}
 	return nil
