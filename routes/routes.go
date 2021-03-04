@@ -14,6 +14,17 @@ func AddRoutes() *gin.Engine {
 	api := r.Group("/api")
 	{
 		api.GET("/", service.GetHome)
+		
+		auth := api.Group("/auth")
+		{
+			auth.POST("/login", service.PostLoginUser)
+			auth.POST("/register", service.PostRegitserUser)
+		}
+
+		user := api.Group("/user")
+		{
+			user.PUT("/edit-password", middleware.IsAuth(), service.PutChangePassword)
+		}
 
 		order := api.Group("/order")
 		{
@@ -23,11 +34,6 @@ func AddRoutes() *gin.Engine {
 			order.PUT("/:order_id", middleware.IsAuth(), service.PutStatusOrder)
 		}
 
-		auth := api.Group("/auth")
-		{
-			auth.POST("/login", service.PostLoginUser)
-			auth.POST("/register", service.PostRegitserUser)
-		}
 	}
 
 	return r
