@@ -2,7 +2,7 @@ package entity
 
 type RegisterUser struct {
 	Name     string `json:"name" binding:"required"`
-	Username string `json:"username" binding:"required"`
+	NoHp     string `json:"no_hp" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }

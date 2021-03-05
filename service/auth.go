@@ -15,15 +15,22 @@ import (
 var JWT_SECRET = os.Getenv("JWT_SECRET")
 
 func PostRegitserUser(c *gin.Context) {
-	var user entity.RegisterUser
-	if err := c.BindJSON(&user); err != nil{
+	var userInput entity.RegisterUser
+	if err := c.BindJSON(&userInput); err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": http.StatusBadRequest,
 		})
 		c.Abort()
 		return
 	}
-	if err := models.RegitserUser(&user); err != nil {
+	if err := models.CheckDataExist(userInput.Email, userInput.NoHp); err != nil {
+		c.JSON(500, gin.H{
+			"status": 500,
+		})
+		c.Abort()
+		return
+	}
+	if err := models.RegitserUser(&userInput); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 		})
