@@ -15,3 +15,9 @@ type ChangePassword struct {
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`
 }
+
+type ShowProfile struct {
+	Name string `json:"name"`
+	Email string `json:"email"`
+	Username string `json:"username"`
+}

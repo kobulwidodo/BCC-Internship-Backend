@@ -19,6 +19,12 @@ func PutChangePassword(newPassword string, user *entity.User) (err error) {
 	return nil
 }
 
+func GetUserDetail(user *entity.User, userProfile *entity.ShowProfile) {
+	userProfile.Name = user.Name
+	userProfile.Email = user.Email
+	userProfile.Username = user.Username
+}
+
 func CheckOldPassword(OldPassword string, password string) (err error)  {
 	if err := bcrypt.CompareHashAndPassword([]byte(password), []byte(OldPassword)); err != nil {
 		return err

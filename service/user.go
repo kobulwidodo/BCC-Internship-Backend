@@ -46,3 +46,21 @@ func PutChangePassword(c *gin.Context) {
 		"status": 200,
 	})
 }
+
+func GetUserDetail(c *gin.Context)  {
+	var user entity.User
+	var userId uint = uint(c.MustGet("jwt_user_id").(float64))
+	if err := models.CheckUserLogin(&user, userId); err != nil {
+		c.JSON(404, gin.H{
+			"status": 404,
+		})
+		c.Abort()
+		return
+	}
+	var userProfile entity.ShowProfile
+	models.GetUserDetail(&user, &userProfile)
+	c.JSON(200, gin.H{
+		"data": userProfile,
+		"status": 200,
+	})
+}
