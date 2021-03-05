@@ -17,7 +17,7 @@ func RegitserUser(user *entity.RegisterUser) (err error) {
 	newUser := entity.User{
 		Name: user.Name,
 		Email: user.Email,
-		NoHp: user.NoHp,
+		Username: user.Username,
 		Password: string(PasswordHash),
 		Role: "Buyer",
 	}
@@ -37,9 +37,9 @@ func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
 	return nil
 }
 
-func CheckDataExist(email string, nohp string) (err error) {
+func CheckDataExist(email string, username string) (err error) {
 	var user entity.User
-	if err := config.DB.First(&user, "email = ? OR no_hp = ?", email, nohp).Error;err == nil {
+	if err := config.DB.First(&user, "email = ? OR username = ?", email, username).Error;err == nil {
 		return errors.New("Data sudah tersedia")
 	}
 	return nil

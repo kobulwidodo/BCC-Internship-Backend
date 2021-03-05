@@ -6,7 +6,7 @@ type User struct {
 	gorm.Model
 	Name string
 	Email string
-	NoHp string
+	Username string
 	Password string
 	Role string
 }

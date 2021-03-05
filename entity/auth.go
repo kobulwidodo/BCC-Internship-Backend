@@ -2,8 +2,8 @@ package entity
 
 type RegisterUser struct {
 	Name     string `json:"name" binding:"required"`
-	NoHp     string `json:"no_hp" binding:"required"`
 	Email    string `json:"email" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 

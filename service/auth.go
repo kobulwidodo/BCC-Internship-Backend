@@ -23,7 +23,7 @@ func PostRegitserUser(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	if err := models.CheckDataExist(userInput.Email, userInput.NoHp); err != nil {
+	if err := models.CheckDataExist(userInput.Email, userInput.Username); err != nil {
 		c.JSON(500, gin.H{
 			"status": 500,
 		})

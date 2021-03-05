@@ -27,6 +27,5 @@ func InitDB() {
 	
 	// DB.AutoMigrate(&entity.Order{})
 	DB.AutoMigrate(&entity.User{})
-	DB.Migrator().DropTable(&entity.Order{}) // hapus db order
-	DB.Migrator().DropColumn(&entity.User{}, "username") // hapus kolom username
+	DB.Migrator().DropColumn(&entity.User{}, "no_hp") // hapus kolom no_hp
 }
