@@ -28,7 +28,7 @@ func RegitserUser(user *entity.RegisterUser) (err error) {
 }
 
 func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
-	if err := config.DB.First(&user, "email = ?", loginUser.Email).Error; err != nil {
+	if err := config.DB.First(&user, "email = ? OR username = ?", loginUser.Email, loginUser.Email).Error; err != nil {
 		return err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginUser.Password)); err != nil {
