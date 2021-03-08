@@ -4,12 +4,14 @@ import (
 	"bengkel/middleware"
 	"bengkel/service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 
 func AddRoutes() *gin.Engine {
 	r := gin.Default()
+	// handler := cors.Default().Handler(r)
 	
 	api := r.Group("/api")
 	{
@@ -36,6 +38,8 @@ func AddRoutes() *gin.Engine {
 		}
 
 	}
+
+	r.Use(cors.Default())
 
 	return r
 }
