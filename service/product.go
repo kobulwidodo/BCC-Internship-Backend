@@ -74,3 +74,29 @@ func PostNewProduct(c *gin.Context) {
 		"status": "sukses",
 	})
 }
+
+func GetProductById(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	product_id := c.Param("product_id")
+	var product entity.Product
+	if err := models.GetProductById(DB, &product, product_id); err != nil {
+		c.JSON(404, gin.H{
+			"message": "Data tidak ditemukan",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"data": product,
+		"message": "Berhasil mengambil 1 data",
+		"status": "sukses",
+	})
+}

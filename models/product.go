@@ -13,6 +13,13 @@ func GetAllProduct(DB *gorm.DB, product *[]entity.Product) error {
 	return nil
 }
 
+func GetProductById(DB *gorm.DB, product *entity.Product, id string) error  {
+	if err := DB.First(product, "id = ?", id).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func PostNewProduct(DB *gorm.DB, product *entity.NewProduct) error {
 	newProduct := entity.Product{
 		Name: product.Name,
