@@ -3,6 +3,7 @@ package routes
 import (
 	"bengkel/middleware"
 	"bengkel/service"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -11,8 +12,15 @@ import (
 
 func AddRoutes() *gin.Engine {
 	r := gin.Default()
-	// handler := cors.Default().Handler(r)
-	r.Use(cors.Default())
+	
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge: 12 * time.Hour,
+	}))
 	
 	api := r.Group("/api")
 	{
