@@ -1,15 +1,15 @@
 package models
 
 import (
-	"bengkel/config"
 	"bengkel/entity"
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 
-func RegitserUser(user *entity.RegisterUser) (err error) {
+func RegitserUser(DB *gorm.DB, user *entity.RegisterUser) error { // change err
 	PasswordHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost);
 	if err != nil {
 		return err
@@ -21,14 +21,14 @@ func RegitserUser(user *entity.RegisterUser) (err error) {
 		Password: string(PasswordHash),
 		Role: "Buyer",
 	}
-	if err := config.DB.Save(&newUser).Error; err != nil {
+	if err := DB.Save(&newUser).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
-	if err := config.DB.First(&user, "email = ? OR username = ?", loginUser.Email, loginUser.Email).Error; err != nil {
+func LoginUser(DB *gorm.DB, loginUser *entity.LoginUser, user *entity.User) (err error) {
+	if err := DB.First(&user, "email = ? OR username = ?", loginUser.Email, loginUser.Email).Error; err != nil {
 		return err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginUser.Password)); err != nil {
@@ -37,9 +37,9 @@ func LoginUser(loginUser *entity.LoginUser, user *entity.User) (err error) {
 	return nil
 }
 
-func CheckDataExist(email string, username string) (err error) {
+func CheckDataExist(DB *gorm.DB, email string, username string) (err error) {
 	var user entity.User
-	if err := config.DB.First(&user, "email = ? OR username = ?", email, username).Error;err == nil {
+	if err := DB.First(&user, "email = ? OR username = ?", email, username).Error;err == nil {
 		return errors.New("Data sudah tersedia")
 	}
 	return nil

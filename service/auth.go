@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bengkel/config"
 	"bengkel/entity"
 	"bengkel/models"
 	"fmt"
@@ -15,6 +16,14 @@ import (
 var JWT_SECRET = os.Getenv("JWT_SECRET")
 
 func PostRegitserUser(c *gin.Context) {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
 	var userInput entity.RegisterUser
 	if err := c.BindJSON(&userInput); err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -23,14 +32,14 @@ func PostRegitserUser(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	if err := models.CheckDataExist(userInput.Email, userInput.Username); err != nil {
+	if err := models.CheckDataExist(DB, userInput.Email, userInput.Username); err != nil {
 		c.JSON(500, gin.H{
 			"status": 500,
 		})
 		c.Abort()
 		return
 	}
-	if err := models.RegitserUser(&userInput); err != nil {
+	if err := models.RegitserUser(DB, &userInput); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 		})
@@ -44,6 +53,14 @@ func PostRegitserUser(c *gin.Context) {
 }
 
 func PostLoginUser(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
 	var loginUser entity.LoginUser
 	if err := c.BindJSON(&loginUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -54,7 +71,7 @@ func PostLoginUser(c *gin.Context)  {
 	}
 
 	var user entity.User
-	err := models.LoginUser(&loginUser, &user)
+	err = models.LoginUser(DB ,&loginUser, &user)
 	if err != nil {
 		c.JSON(404, gin.H{
 			"status": 404,

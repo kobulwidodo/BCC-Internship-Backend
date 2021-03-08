@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bengkel/config"
 	"bengkel/entity"
 	"bengkel/models"
 	"net/http"
@@ -10,6 +11,14 @@ import (
 
 
 func PutChangePassword(c *gin.Context) {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
 	var userInput entity.ChangePassword
 	if err := c.BindJSON(&userInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -20,7 +29,7 @@ func PutChangePassword(c *gin.Context) {
 	}
 	var user entity.User
 	var userId uint = uint(c.MustGet("jwt_user_id").(float64))
-	if err := models.CheckUserLogin(&user, userId); err != nil {
+	if err := models.CheckUserLogin(DB, &user, userId); err != nil {
 		c.JSON(404, gin.H{
 			"status": 404,
 		})
@@ -34,7 +43,7 @@ func PutChangePassword(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	if err := models.PutChangePassword(userInput.NewPassword, &user); err != nil {
+	if err := models.PutChangePassword(DB, userInput.NewPassword, &user); err != nil {
 		c.JSON(500, gin.H{
 			"status": 500,
 		})
@@ -48,9 +57,17 @@ func PutChangePassword(c *gin.Context) {
 }
 
 func GetUserDetail(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
 	var user entity.User
 	var userId uint = uint(c.MustGet("jwt_user_id").(float64))
-	if err := models.CheckUserLogin(&user, userId); err != nil {
+	if err := models.CheckUserLogin(DB, &user, userId); err != nil {
 		c.JSON(404, gin.H{
 			"status": 404,
 		})
