@@ -152,3 +152,45 @@ func PutProduct(c *gin.Context)  {
 		"status": "sukses",
 	})
 }
+
+func DeleteProduct(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	product_id := c.Param("product_id")
+	var product entity.Product
+	if err := models.GetProductById(DB, &product, product_id); err != nil {
+		c.JSON(404, gin.H{
+			"message": "Product tidak ditersedia",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	role := c.MustGet("jwt_user_role")
+	if role != "Staff" && role != "Owner" {
+		c.JSON(403, gin.H{
+			"message": "Tidak memiliki akses",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	if err := models.DeleteProduct(DB, &product); err != nil {
+		c.JSON(500, gin.H{
+			"message": "Gagal menghapus product",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"message": "Berhasil menghapus product",
+		"status": "sukses",
+	})
+}

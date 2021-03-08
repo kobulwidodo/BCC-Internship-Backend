@@ -47,3 +47,10 @@ func PutProduct(DB *gorm.DB, product *entity.Product, productExist *entity.Produ
 	}
 	return nil
 }
+
+func DeleteProduct(DB *gorm.DB, product *entity.Product) error  {
+	if err := DB.Delete(&product).Error; err != nil {
+		return err
+	}
+	return nil
+}
