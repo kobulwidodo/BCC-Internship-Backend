@@ -34,3 +34,16 @@ func PostNewProduct(DB *gorm.DB, product *entity.NewProduct) error {
 	}
 	return nil
 }
+
+func PutProduct(DB *gorm.DB, product *entity.Product, productExist *entity.Product) error  {
+	productExist.Name = product.Name
+	productExist.Description = product.Description
+	productExist.Manufacture = product.Manufacture
+	productExist.Price = product.Price
+	productExist.ImageLink = product.ImageLink
+	productExist.IsAvailable = product.IsAvailable
+	if err := DB.Save(&productExist).Error; err != nil {
+		return err
+	}
+	return nil
+}

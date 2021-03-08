@@ -4,6 +4,7 @@ import (
 	"bengkel/config"
 	"bengkel/entity"
 	"bengkel/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,7 +57,7 @@ func PostNewProduct(c *gin.Context) {
 	if role != "Staff" && role != "Owner" {
 		c.JSON(403, gin.H{
 			"message": "Tidak memiliki akses",
-			"status": "Forbidden Request",
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -97,6 +98,57 @@ func GetProductById(c *gin.Context)  {
 	c.JSON(200, gin.H{
 		"data": product,
 		"message": "Berhasil mengambil 1 data",
+		"status": "sukses",
+	})
+}
+
+func PutProduct(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	var product entity.Product
+	if err := c.BindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Parameter tidak lengkap",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	var role string = c.MustGet("jwt_user_role").(string)
+	if role != "Staff" && role != "Owner" {
+		c.JSON(403, gin.H{
+			"message": "Tidak memiliki akses",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	product_id := c.Param("product_id")
+	var productExist entity.Product
+	if err := models.GetProductById(DB, &productExist, product_id); err != nil {
+		c.JSON(404, gin.H{
+			"message": "Product Tidak ditemukan",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	if err := models.PutProduct(DB, &product, &productExist); err != nil {
+		c.JSON(500, gin.H{
+			"message": "Internal server error",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"message": "Berhasil update product",
 		"status": "sukses",
 	})
 }
