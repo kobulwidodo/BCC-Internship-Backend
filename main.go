@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bengkel/config"
 	"bengkel/routes"
+	"fmt"
 	"log"
 	"os"
 
@@ -11,8 +11,10 @@ import (
 
 
 func main() {
-	gotenv.Load()
-	config.InitDB()
+	if err := gotenv.Load(); err != nil {
+		fmt.Println(err)
+		panic("Failed load gotenv")
+	} // handler error
 	log.Println(os.Getenv("DB_HOST"))
 	r := routes.AddRoutes()
 
