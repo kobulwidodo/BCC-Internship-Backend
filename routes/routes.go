@@ -12,6 +12,7 @@ import (
 func AddRoutes() *gin.Engine {
 	r := gin.Default()
 	// handler := cors.Default().Handler(r)
+	r.Use(cors.Default())
 	
 	api := r.Group("/api")
 	{
@@ -39,7 +40,6 @@ func AddRoutes() *gin.Engine {
 
 	}
 
-	r.Use(cors.Default())
 
 	return r
 }
