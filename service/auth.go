@@ -26,15 +26,17 @@ func PostRegitserUser(c *gin.Context) {
 	}
 	var userInput entity.RegisterUser
 	if err := c.BindJSON(&userInput); err != nil{
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
+		c.JSON(400, gin.H{
+			"message": "Parameter tidak lengkap",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	if err := models.CheckDataExist(DB, userInput.Email, userInput.Username); err != nil {
 		c.JSON(500, gin.H{
-			"status": 500,
+			"message": "Username atau Email sudah digunakan",
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -46,9 +48,9 @@ func PostRegitserUser(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(201, gin.H{
+	c.JSON(200, gin.H{
 		"message" : "Berhasil membuat Akun",
-		"status": 201,
+		"status": "sukses",
 	})
 }
 
@@ -63,8 +65,9 @@ func PostLoginUser(c *gin.Context)  {
 	}
 	var loginUser entity.LoginUser
 	if err := c.BindJSON(&loginUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
+		c.JSON(400, gin.H{
+			"message": "Parameter tidak lengkap",
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -74,7 +77,8 @@ func PostLoginUser(c *gin.Context)  {
 	err = models.LoginUser(DB ,&loginUser, &user)
 	if err != nil {
 		c.JSON(404, gin.H{
-			"status": 404,
+			"message": "Username atau Email tidak cocok",
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -82,9 +86,9 @@ func PostLoginUser(c *gin.Context)  {
 	var jwtToken = generateToken(&user)
 
 	c.JSON(200, gin.H{
-		"status": 200,
-		"message": "Berhasil Login!",
 		"token": jwtToken,
+		"message": "Berhasil Login!",
+		"status": "sukses",
 	})
 
 }

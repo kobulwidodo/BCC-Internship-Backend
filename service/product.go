@@ -21,9 +21,9 @@ func GetAllProduct(c *gin.Context) {
 	}
 	var product []entity.Product
 	if err := models.GetAllProduct(DB, &product); err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(500, gin.H{
 			"message": "Gagal mendapatkan data product",
-			"status": err.Error(),
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -65,7 +65,7 @@ func PostNewProduct(c *gin.Context) {
 	if err := models.PostNewProduct(DB, &newProduct); err != nil {
 		c.JSON(500, gin.H{
 			"message": "Gagal Menambah data Baru",
-			"status": err.Error(),
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -166,7 +166,7 @@ func DeleteProduct(c *gin.Context)  {
 	var product entity.Product
 	if err := models.GetProductById(DB, &product, product_id); err != nil {
 		c.JSON(404, gin.H{
-			"message": "Product tidak ditersedia",
+			"message": "Product tidak tersedia",
 			"status": "error",
 		})
 		c.Abort()

@@ -22,7 +22,8 @@ func PutChangePassword(c *gin.Context) {
 	var userInput entity.ChangePassword
 	if err := c.BindJSON(&userInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
+			"message": "Parameter tidak lengkap",
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -31,28 +32,31 @@ func PutChangePassword(c *gin.Context) {
 	var userId uint = uint(c.MustGet("jwt_user_id").(float64))
 	if err := models.CheckUserLogin(DB, &user, userId); err != nil {
 		c.JSON(404, gin.H{
-			"status": 404,
+			"message": "User login tidak ditemukan",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	if err := models.CheckOldPassword(userInput.OldPassword, user.Password); err != nil {
 		c.JSON(403, gin.H{
-			"status": 403,
+			"message": "Password lama tidak sesuai",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	if err := models.PutChangePassword(DB, userInput.NewPassword, &user); err != nil {
 		c.JSON(500, gin.H{
-			"status": 500,
+			"message": "Terjadi kesalahan server",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	c.JSON(200, gin.H{
 		"message": "Berhasil mengubah password!",
-		"status": 200,
+		"status": "sukses",
 	})
 }
 
@@ -69,7 +73,8 @@ func GetUserDetail(c *gin.Context)  {
 	var userId uint = uint(c.MustGet("jwt_user_id").(float64))
 	if err := models.CheckUserLogin(DB, &user, userId); err != nil {
 		c.JSON(404, gin.H{
-			"status": 404,
+			"message": "Data user tidak ditemukan",
+			"status": "error",
 		})
 		c.Abort()
 		return
@@ -78,6 +83,7 @@ func GetUserDetail(c *gin.Context)  {
 	models.GetUserDetail(&user, &userProfile)
 	c.JSON(200, gin.H{
 		"data": userProfile,
-		"status": 200,
+		"message": "Berhasil mendapatkan data",
+		"status": "sukses",
 	})
 }
