@@ -20,9 +20,18 @@ func PutChangePassword(DB *gorm.DB, newPassword string, user *entity.User) (err 
 }
 
 func GetUserDetail(user *entity.User, userProfile *entity.ShowProfile) {
+	userProfile.Id = user.ID
 	userProfile.Name = user.Name
 	userProfile.Email = user.Email
 	userProfile.Username = user.Username
+	userProfile.Role = user.Role
+}
+
+func GetAllUser(DB *gorm.DB, userProfile *[]entity.ShowProfile) error {
+	if err := DB.Raw("SELECT * FROM users").Scan(userProfile).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func CheckOldPassword(OldPassword string, password string) (err error)  {

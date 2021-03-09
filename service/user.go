@@ -87,3 +87,38 @@ func GetUserDetail(c *gin.Context)  {
 		"status": "sukses",
 	})
 }
+
+func GetAllUser(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	var role string = string(c.MustGet("jwt_user_role").(string))
+	if role != "Staff" && role != "Owner" {
+		c.JSON(403, gin.H{
+			"message": "Tidak memiliki akses",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	var user []entity.ShowProfile
+	if err := models.GetAllUser(DB, &user); err != nil {
+		c.JSON(500, gin.H{
+			"message": "Gagal mendapatkan data",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"data": user,
+		"message": "Berhasil mendapatkan seluruh data",
+		"status": "sukses",
+	})
+
+}

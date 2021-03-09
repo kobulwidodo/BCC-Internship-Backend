@@ -34,6 +34,7 @@ func AddRoutes() *gin.Engine {
 
 		user := api.Group("/user")
 		{
+			user.GET("/", middleware.IsAuth(), service.GetAllUser)
 			user.PUT("/edit-password", middleware.IsAuth(), service.PutChangePassword)
 			user.GET("/detail", middleware.IsAuth(), service.GetUserDetail)
 		}
