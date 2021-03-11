@@ -48,6 +48,11 @@ func AddRoutes() *gin.Engine {
 			product.DELETE("/:product_id", middleware.IsAuth(), service.DeleteProduct)
 		}
 
+		cart := api.Group("/cart")
+		{
+			cart.POST("/new", middleware.IsAuth(), service.PostNewCart)
+		}
+
 		order := api.Group("/order")
 		{
 			order.GET("/", service.GetAllOrder)
