@@ -53,3 +53,33 @@ func PostNewCart(c *gin.Context) {
 		"status": "error",
 	})
 }
+
+func GetAllCart(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": err.Error(),
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	userId := int(c.MustGet("jwt_user_id").(float64))
+	var cart []entity.Cart
+	if err := models.GetAllCart(DB, &cart, userId); err != nil {
+		c.JSON(404, gin.H{
+			"message": "Tidak dapat menemukan data",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	// fmt.Println(len(cart))
+	// return
+	dataCart := models.GetAllCartDetail(DB, &cart)
+	c.JSON(200, gin.H{
+		"data": dataCart,
+		"message": "Sukses mengambil data",
+		"status": "sukses",
+	})
+}
