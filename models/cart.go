@@ -72,13 +72,20 @@ func PutAddQuantity(DB *gorm.DB, cart *entity.Cart) error {
 func PutReduceQuantity(DB *gorm.DB, cart *entity.Cart) error {
 	cart.Quantity -= 1
 	if cart.Quantity == 0 {
-		if err := DB.Delete(&cart).Error; err != nil {
+		if err := DeleteCart(DB, cart); err != nil {
 			return err
 		}
 	} else  {
 		if err := DB.Save(&cart).Error; err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func DeleteCart(DB *gorm.DB, cart *entity.Cart) (error) {
+	if err := DB.Delete(&cart).Error; err != nil {
+		return err
 	}
 	return nil
 }

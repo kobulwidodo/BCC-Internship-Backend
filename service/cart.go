@@ -43,14 +43,14 @@ func PostNewCart(c *gin.Context) {
 	if err := models.PostNewCart(DB, &newCart, userId); err != nil {
 		c.JSON(500, gin.H{
 			"message": "Gagal memasukan data",
-			"status": "sukses",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	c.JSON(200, gin.H{
 		"message": "Berhasil memasukan data",
-		"status": "error",
+		"status": "sukses",
 	})
 }
 
@@ -150,6 +150,41 @@ func PutReduceQuantity(c *gin.Context)  {
 	}
 	c.JSON(200, gin.H{
 		"message": "Berhasil mengubah data",
+		"status": "sukses",
+	})
+}
+
+func DeleteCart(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": err.Error(),
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	cartId, _ := strconv.Atoi(c.Param("cart_id"))
+	userId := int(c.MustGet("jwt_user_id").(float64))
+	var cart entity.Cart
+	if err := models.GetCartById(DB, &cart, cartId, userId); err != nil {
+		c.JSON(404, gin.H{
+			"message": "Tidak dapat menemukan Data",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	if err := models.DeleteCart(DB, &cart); err != nil {
+		c.JSON(500, gin.H{
+			"message": "Gagal menghapus data",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"message": "Berhasil menghapus product di cart",
 		"status": "sukses",
 	})
 }
