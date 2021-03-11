@@ -49,6 +49,7 @@ func GetAllCartDetail(DB *gorm.DB, cart *[]entity.Cart) (entity.ShowCart) {
 	}
 	var tempCart entity.ShowCart
 	tempCart.GetAllCart = showCart
+	tempCart.TotalProduct = len(showCart)
 	tempCart.TotalPrice = price
 	return tempCart
 }

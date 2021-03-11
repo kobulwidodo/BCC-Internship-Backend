@@ -27,5 +27,6 @@ type GetAllCart struct {
 
 type ShowCart struct {
 	GetAllCart interface{} `json:"cart"`
+	TotalProduct interface{} `json:"total_product"`
 	TotalPrice interface{} `json:"total_price"`
 }
