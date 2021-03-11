@@ -2,6 +2,7 @@ package models
 
 import (
 	"bengkel/entity"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -20,8 +21,8 @@ func PostNewCart(DB *gorm.DB, cart *entity.PostNewCart, userId int) error {
 }
 
 func GetAllCart(DB *gorm.DB, cart *[]entity.Cart, userId int) error {
-	if err := DB.Find(&cart, "user_id = ?", userId).Error; err != nil {
-		return err
+	if jml := DB.Find(&cart, "user_id = ?", userId).RowsAffected; jml == 0 {
+		return errors.New("Data tidak ditemukan")
 	}
 	return nil
 }
