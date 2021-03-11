@@ -53,3 +53,18 @@ func GetAllCartDetail(DB *gorm.DB, cart *[]entity.Cart) (entity.ShowCart) {
 	tempCart.TotalPrice = price
 	return tempCart
 }
+
+func GetCartById(DB *gorm.DB, cart *entity.Cart, cartId int, userId int) (error) {
+	if err := DB.First(&cart, "id = ? AND user_id = ?", cartId, userId).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func PutAddQuantity(DB *gorm.DB, cart *entity.Cart) error {
+	cart.Quantity += 1
+	if err := DB.Save(&cart).Error; err != nil {
+		return err
+	}
+	return nil
+}
