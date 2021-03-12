@@ -1,109 +1,121 @@
 package service
 
 import (
+	"bengkel/config"
 	"bengkel/entity"
 	"bengkel/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 
-func GetAllOrder(c *gin.Context) {
-	var order []entity.Order
-	err := models.GetAllOrders(&order)
+func PostNewOrder(c *gin.Context) {
+	DB, err := config.InitDB()
 	if err != nil {
-		c.JSON(404, gin.H{
-			"status": http.StatusNotFound,
-		})
-	} else {
-		c.JSON(400, gin.H{
-			"data": order,
-			"status": http.StatusOK,
-		})
-	}
-}
-
-func PostNewOrder(c *gin.Context)  {
-	var order entity.NewOrder
-	if err := c.BindJSON(&order); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
+		c.JSON(500, gin.H{
+			"message": err.Error(),
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
-	newOrderId, err := models.PostNewOrder(&order)
-	if err != nil {
-		fmt.Println(err.Error())
+	var newOrder entity.NewOrder
+	if err := c.BindJSON(&newOrder); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Parameter tidak lengkap",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	userId := int(c.MustGet("jwt_user_id").(float64))
+	var cart []entity.Cart
+	if err := models.GetAllCart(DB, &cart, userId); err != nil {
 		c.JSON(404, gin.H{
-			"status": http.StatusNotFound,
+			"message": "Cart kosong",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	transactionId := models.GenerateTransactionId(DB)
+	totalPrice, err := models.PostNewItemOrder(DB, &cart, transactionId, userId)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Gagal memasukan data",
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	if err := models.PostNewOrder(DB, &newOrder, totalPrice, transactionId, userId); err != nil {
+		c.JSON(500, gin.H{
+			"message": "Gagal memasukan data",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	c.JSON(200, gin.H{
+		"transaction_id": transactionId,
 		"message": "Berhasil membuat pesanan baru",
-		"order_id": newOrderId,
-		"status": http.StatusOK,
+		"status": "sukses",
 	})
 }
 
-func GetOrder(c *gin.Context)  {
-	var order entity.Order
-	order_id := c.Param("order_id")
-	err := models.GetOrder(&order, order_id)
+func GetAllItemOrder(c *gin.Context)  {
+	DB, err := config.InitDB()
 	if err != nil {
+		c.JSON(500, gin.H{
+			"message": err.Error(),
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	userId := int(c.MustGet("jwt_user_id").(float64))
+	var showItemOrder []entity.ShowItemOrder
+	if err := models.GetAllItemOrder(DB, &showItemOrder, userId); err != nil {
 		c.JSON(404, gin.H{
-			"status": http.StatusNotFound,
+			"message": "Tidak dapat menemukan data",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
 	c.JSON(200, gin.H{
-		"data": order,
-		"status": http.StatusOK,
+		"data": &showItemOrder,
+		"message": "Sukses mendapatkan data",
+		"status": "sukses",
 	})
 }
 
-func PutStatusOrder(c *gin.Context)  {
+func GetOrderDetailById(c *gin.Context)  {
+	DB, err := config.InitDB()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": err.Error(),
+			"status": "error",
+		})
+		c.Abort()
+		return
+	}
+	transactionId := c.Param("transaction_id")
 	var order entity.Order
-	orderId := c.Param("order_id")
-	err := models.GetOrder(&order, orderId)
-	if err != nil {
+	if err := models.GetOrderDetailById(DB, &order, transactionId); err != nil {
 		c.JSON(404, gin.H{
-			"status": http.StatusNotFound,
+			"message": "Tidak dapat menemukan data",
+			"status": "error",
 		})
 		c.Abort()
 		return
 	}
-	var isAdmin string = c.MustGet("jwt_user_role").(string)
-	if isAdmin == "Buyer" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status": http.StatusUnauthorized,
-		})
-		c.Abort()
-		return
-	}
-	var newStatus entity.UpdateStatus
-	if err := c.BindJSON(&newStatus); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
-		})
-		c.Abort()
-		return
-	}
-	err = models.UpdateStatus(&order, newStatus.Status)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": http.StatusInternalServerError,
-		})
-		c.Abort()
-		return
-	}
+	var showOrder entity.ShowOrder
+	models.ShowOrderDetailById(&order, &showOrder)
 	c.JSON(200, gin.H{
-		"message": "Berhasil Update Status",
-		"status": http.StatusOK,
+		"data": showOrder,
+		"message": "Berhasil mendapatkan data",
+		"status": "sukses",
 	})
 }

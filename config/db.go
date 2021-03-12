@@ -32,5 +32,11 @@ func InitDB() (*gorm.DB, error) {
 	if err := DB.AutoMigrate(&entity.Cart{}); err != nil {
 		return nil, err
 	}
+	if err := DB.AutoMigrate(&entity.Order{}); err != nil {
+		return nil, err
+	}
+	if err := DB.AutoMigrate(&entity.ItemOrder{}); err != nil {
+		return nil, err
+	}
 	return DB, nil
 }

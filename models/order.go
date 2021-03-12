@@ -1,52 +1,54 @@
 package models
 
 import (
-	"bengkel/config"
 	"bengkel/entity"
 	"math/rand"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 
-func GetAllOrders(order *[]entity.Order) (err error) {
-	if err := config.DB.Find(order).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-func PostNewOrder(order *entity.NewOrder) (orderId string, err error)  {
-	newOrderId := generateOrderID();
-	dataNewOrder := entity.Order{
-		OrderID: newOrderId,
-		Name: order.Name,
-		Email: order.Email,
-		NoWhatsapp: order.NoWhatsapp,
-		Order: order.Order,
+func PostNewOrder(DB *gorm.DB, newOrder *entity.NewOrder, totalPrice int, trxId string, userId int) error {
+	order := entity.Order{
+		Name: newOrder.Name,
+		NoHp: newOrder.NoHp,
+		TransportationType: newOrder.TransportationType,
+		LicencePlate: newOrder.LicencePlate,
+		OrderDescription: newOrder.OrderDescription,
+		Complaint: newOrder.Complaint,
+		TotalPrice: totalPrice,
+		StnkImage: newOrder.StnkImage,
+		TransactionId: trxId,
 		Status: "Menunggu Konfirmasi",
+		UserId: userId,
 	}
-	if err := config.DB.Save(&dataNewOrder).Error; err != nil {
-		return "", err
-	}
-	return newOrderId, nil
-}
-
-func GetOrder(order *entity.Order, id string) (err error)  {
-	if err := config.DB.First(order, "order_id", id).Error; err != nil {
+	if err := DB.Save(&order).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateStatus(order *entity.Order, status string) (err error)  {
-	order.Status = status
-	if err := config.DB.Save(order).Error; err != nil {
+func GetOrderDetailById(DB *gorm.DB, order *entity.Order, transactionId string) error {
+	if err := DB.First(&order, "transaction_id = ?", transactionId).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func generateOrderID() string {
+func ShowOrderDetailById(order *entity.Order, showOrder *entity.ShowOrder)  {
+	showOrder.Name = order.Name
+	showOrder.NoHp = order.NoHp
+	showOrder.TransportationType = order.TransportationType
+	showOrder.LicencePlate = order.LicencePlate
+	showOrder.OrderDescription = order.OrderDescription
+	showOrder.Complaint = order.Complaint
+	showOrder.CreatedAt = order.CreatedAt
+	showOrder.TotalPrice = order.TotalPrice
+	showOrder.Status = order.Status
+}
+
+func GenerateTransactionId(DB *gorm.DB) string {
 	var order entity.Order
 	var b []rune
 	for i := 0; i < 1; i++ {
@@ -57,7 +59,7 @@ func generateOrderID() string {
 		for i := range b {
 			b[i] = letters[rand.Intn(len(letters))]
 		}
-		err := config.DB.First(&order, "order_id = ?", string(b)).Error
+		err := DB.First(&order, "transaction_id = ?", string(b)).Error
 		if err != nil {
 			i++
 		}
