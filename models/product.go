@@ -2,13 +2,14 @@ package models
 
 import (
 	"bengkel/entity"
+	"errors"
 
 	"gorm.io/gorm"
 )
 
 func GetAllProduct(DB *gorm.DB, product *[]entity.Product) error {
-	if err := DB.Find(product).Error; err != nil {
-		return err
+	if jml := DB.Find(product).RowsAffected; jml == 0 {
+		return errors.New("Tidak ada data satupun")
 	}
 	return nil
 }
