@@ -2,6 +2,7 @@ package models
 
 import (
 	"bengkel/entity"
+	"errors"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -27,8 +28,9 @@ func PostNewAdmin(DB *gorm.DB) error {
 
 func CheckDataAdmin(DB *gorm.DB) error {
 	var user entity.User
-	if err := DB.First(&user, "Role = ?", "Owner").Error; err == nil {
-		return err
+	err := DB.First(&user, "role = ?", "Owner").Error
+	if err != nil {
+		return nil
 	}
-	return nil
+	return errors.New("telah terdaftar")
 }
