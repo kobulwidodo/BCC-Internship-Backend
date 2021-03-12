@@ -43,7 +43,7 @@ func PostNewOrder(c *gin.Context) {
 	totalPrice, err := models.PostNewItemOrder(DB, &cart, transactionId, userId)
 	if err != nil {
 		c.JSON(500, gin.H{
-			"message": "Gagal memasukan data",
+			"message": "Gagal memasukan data (item order)",
 			"status": "error",
 		})
 		c.Abort()
@@ -51,7 +51,7 @@ func PostNewOrder(c *gin.Context) {
 	}
 	if err := models.PostNewOrder(DB, &newOrder, totalPrice, transactionId, userId); err != nil {
 		c.JSON(500, gin.H{
-			"message": "Gagal memasukan data",
+			"message": "Gagal memasukan data (order)",
 			"status": "error",
 		})
 		c.Abort()
