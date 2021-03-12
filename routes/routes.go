@@ -64,6 +64,11 @@ func AddRoutes() *gin.Engine {
 			order.GET("/:transaction_id", service.GetOrderDetailById)
 		}
 
+		migrate := api.Group("/migrate")
+		{
+			migrate.GET("/account-admin", service.PostNewAdmin)
+		}
+
 	}
 
 
