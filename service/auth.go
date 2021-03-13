@@ -26,6 +26,7 @@ func PostRegitserUser(c *gin.Context) {
 	}
 	var userInput entity.RegisterUser
 	if err := c.BindJSON(&userInput); err != nil{
+		c.Header("Content-Type", "application/json; charset=utf-8")
 		c.JSON(400, gin.H{
 			"message": "Parameter tidak lengkap",
 			"status": "error",
